@@ -134,6 +134,14 @@ function updateUser($conn) {
         return;
     }
 
+    if(!filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
+        echo json_encode([
+            "status" => false,
+            "message" => "Invalid email format"
+        ]);
+        return; 
+    }
+
     $stmt = $conn->prepare(
         "UPDATE users SET fullname = ?, email = ? WHERE id = ?"
     );
