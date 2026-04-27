@@ -5,6 +5,7 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type");
 
 require_once 'db.php';
+CONST MIO_ERRORE = "Invalid request method";
 
 $database = new Database();
 $conn = $database->connect();
@@ -33,10 +34,18 @@ switch ($method) {
         deleteUser($conn);
         break;
 
+    case 'OPTIONS':
+        http_response_code(200);
+        echo json_encode([
+            "status" => true,
+            "message" => "OK"
+        ]);
+        break;
+
     default:
         echo json_encode([
             "status" => false,
-            "message" => "Invalid request method"
+            "message" => MIO_ERRORE
         ]);
         break;
 }
@@ -72,13 +81,18 @@ function getSingleUser($conn, $id) {
     }
 }
 
+
 function insertUser($conn) {
-    $data = json_decode(file_get_contents("php://input"), true);
+    //$data = json_decode(file_get_contents("php://input"), true);
+
+    $localFullname = trim($_POST['fullname']);
+    $localEmail = trim($_POST['email']);
+    $localPassword = trim($_POST['password']);
 
     if (
-        empty($_POST['fullname']) ||
-        empty($_POST['email']) ||
-        empty($_POST['password'])
+        empty($localFullname) ||
+        empty($localEmail) ||
+        empty($localPassword)
     ) {
         echo json_encode([
             "status" => false,
@@ -87,15 +101,15 @@ function insertUser($conn) {
         return;
     }
 
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = password_hash($localPassword, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare(
         "INSERT INTO users(fullname,email,password) VALUES(?,?,?)"
     );
 
     $success = $stmt->execute([
-        $_POST['fullname'],
-        $_POST['email'],
+        $localFullname,
+        $localEmail,
         $password
     ]);
 

@@ -9,15 +9,28 @@ if(isset($_POST['register'])) {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); //crittazione della password
     $nickname = trim($_POST['nickname']);
 
-    var_dump($nickname);
+   // var_dump($nickname);
 
     $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $check_due = $conn->prepare("SELECT id FROM users WHERE nickname = ?");
     $check->execute([$email]);
+    $check_due->execute([$nickname]);
 
     if($check->rowCount() > 0) {
         $message = "Email already exists!";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users(fullname, email, password, nickname) VALUES(?,?,?)");
+        $stmt = $conn->prepare("INSERT INTO users(fullname, email, password, nickname) VALUES(?,?,?,?)");
+        if($stmt->execute([$fullname, $email, $password, $nickname])) {
+            $message = "Registration successful!";
+        } else {
+            $message = "Something went wrong!";
+        }
+    }
+
+    if($check_due->rowCount() > 0) {
+        $message = "Nickname already exists!";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO users(fullname, email, password, nickname) VALUES(?,?,?,?)");
         if($stmt->execute([$fullname, $email, $password, $nickname])) {
             $message = "Registration successful!";
         } else {
