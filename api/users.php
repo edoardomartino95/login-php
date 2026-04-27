@@ -76,9 +76,9 @@ function insertUser($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (
-        empty($data['fullname']) ||
-        empty($data['email']) ||
-        empty($data['password'])
+        empty($_POST['fullname']) ||
+        empty($_POST['email']) ||
+        empty($_POST['password'])
     ) {
         echo json_encode([
             "status" => false,
@@ -87,15 +87,15 @@ function insertUser($conn) {
         return;
     }
 
-    $password = password_hash($data['password'], PASSWORD_DEFAULT);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare(
         "INSERT INTO users(fullname,email,password) VALUES(?,?,?)"
     );
 
     $success = $stmt->execute([
-        $data['fullname'],
-        $data['email'],
+        $_POST['fullname'],
+        $_POST['email'],
         $password
     ]);
 
