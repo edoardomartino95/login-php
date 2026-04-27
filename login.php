@@ -6,6 +6,7 @@ $message = "";
 if(isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
+    $nickname = trim($_POST['nickname']);
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
@@ -14,6 +15,7 @@ if(isset($_POST['login'])) {
     if($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['nickname'] = $user['nickname'];
         header("Location: dashboard.php");
         exit;
     } else {
@@ -35,6 +37,7 @@ if(isset($_POST['login'])) {
         <h2>Login</h2>
         <p class="message"><?= $message ?></p>
         <input type="email" name="email" placeholder="Email Address" required>
+        <input type="text" name="nickname" placeholder="Nickname" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit" name="login">Login</button>
         <p>No account? <a href="register.php">Register</a></p>

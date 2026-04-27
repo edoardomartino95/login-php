@@ -15,7 +15,7 @@ class Database {
                 $this->username,
                 $this->password
             );
-
+            //pdo è il tentativo di connessione 
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         } catch(PDOException $e) {
